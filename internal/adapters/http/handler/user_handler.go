@@ -6,7 +6,12 @@ import (
 
 	"game-project/internal/application"
 	"game-project/internal/application/command"
+	"game-project/internal/domain"
 )
+
+func NewUserHandler(repository domain.UserRepository) *UserHandler {
+	return &UserHandler{Service: application.NewUserService(repository)}
+}
 
 type UserHandler struct {
 	Service application.UserService

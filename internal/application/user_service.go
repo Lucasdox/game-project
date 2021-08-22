@@ -6,11 +6,15 @@ import (
 )
 
 type UserService interface {
-	CreateUser(user command.CreateUser) (domain.User, error)
+	CreateUser(user command.CreateUser) (*domain.User, error)
 }
 
 type UserServiceImpl struct {
 	repository domain.UserRepository
+}
+
+func (s *UserServiceImpl) CreateUser(user command.CreateUser) (*domain.User, error) {
+	return s.repository.Create(user.Name)
 }
 
 func NewUserService(r domain.UserRepository) *UserServiceImpl {

@@ -10,5 +10,5 @@ type User struct {
 }
 
 type UserRepository interface {
-	Create(uName string) (User, error)
+	Create(uName string) (*User, error)
 }
