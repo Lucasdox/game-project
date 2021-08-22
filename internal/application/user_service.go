@@ -40,7 +40,21 @@ func (s *UserServiceImpl) ListUser() []*query.User {
 }
 
 func (s *UserServiceImpl) ListUserFriends(userId uuid.UUID) *query.UserFriends {
-	return s.repository.ListFriends(userId)
+	var friendsLstRes []*query.Friend
+	friendLst := s.repository.ListFriends(userId)
+
+	for _, friend := range friendLst {
+		friendRes := query.Friend{
+			Id:        friend.Id,
+			Name:      friend.Name,
+		}
+		if friend.Score.Valid {
+			friendRes.Highscore = friend.Score.Int64
+		}
+		friendsLstRes = append(friendsLstRes, &friendRes)
+	}
+
+	return &query.UserFriends{Friends: friendsLstRes}
 }
 
 

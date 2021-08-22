@@ -5,7 +5,7 @@ import "github.com/gofrs/uuid"
 type Friend struct {
 	Id        uuid.UUID `json:"id"`
 	Name      string    `json:"name"`
-	Highscore int32      `json:"highscore,omitempty"`
+	Highscore int64      `json:"highscore,omitempty"`
 }
 
 type UserFriends struct {

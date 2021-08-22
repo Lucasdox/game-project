@@ -22,6 +22,7 @@ type UserHandler struct {
 }
 
 func (h *UserHandler) List(writer http.ResponseWriter, request *http.Request) {
+	log.Info("Received List all users request")
 	query := h.Service.ListUser()
 
 	res, _ := json.Marshal(query)
@@ -31,6 +32,7 @@ func (h *UserHandler) List(writer http.ResponseWriter, request *http.Request) {
 }
 
 func (h *UserHandler) Create(writer http.ResponseWriter, request *http.Request) {
+	log.Info("Received Create user request")
 	var command command.CreateUser
 
 	err := json.NewDecoder(request.Body).Decode(&command)
@@ -54,6 +56,7 @@ func (h *UserHandler) Create(writer http.ResponseWriter, request *http.Request) 
 func (h *UserHandler) UpdateUserState(writer http.ResponseWriter, request *http.Request) {
 	var command command.UpdateUserState
 	vars := mux.Vars(request)
+	log.Infof("Received UpdateUserState request for user id: %s", vars["userId"])
 	id, err := uuid.FromString(vars["userId"])
 	if err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
@@ -77,6 +80,7 @@ func (h *UserHandler) UpdateUserState(writer http.ResponseWriter, request *http.
 func (h *UserHandler) LoadUserState(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	id, err := uuid.FromString(vars["userId"])
+	log.Infof("Received LoadUserState request for user id: %s", vars["userId"])
 	if err != nil {
 		log.Warn("Request with invalid UUID")
 		writer.WriteHeader(http.StatusBadRequest)
@@ -99,6 +103,7 @@ func (h *UserHandler) UpdateUserFriends(writer http.ResponseWriter, request *htt
 	var command command.UpdateUserFriends
 	vars := mux.Vars(request)
 	id, err := uuid.FromString(vars["userId"])
+	log.Infof("Received UpdateUserFriends request for user id: %s", vars["userId"])
 	if err != nil {
 		log.Warn("Request with invalid UUID")
 		writer.WriteHeader(http.StatusBadRequest)
@@ -124,6 +129,7 @@ func (h *UserHandler) UpdateUserFriends(writer http.ResponseWriter, request *htt
 func (h *UserHandler) ListUserFriends(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	id, err := uuid.FromString(vars["userId"])
+	log.Infof("Received ListUserFriends request for user id: %s", vars["userId"])
 	if err != nil {
 		log.Warn("Request with invalid UUID")
 		writer.WriteHeader(http.StatusBadRequest)
