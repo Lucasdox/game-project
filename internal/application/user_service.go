@@ -12,6 +12,7 @@ import (
 )
 
 type UserService interface {
+	ListUser() []*query.User
 	CreateUser(user command.CreateUser) (*query.User, error)
 	UpdateUserState(userId uuid.UUID, command command.UpdateUserState) error
 	LoadUserState(userId uuid.UUID) (*query.UserGameStateQuery, error)
@@ -21,6 +22,21 @@ type UserService interface {
 
 type UserServiceImpl struct {
 	repository domain.UserRepository
+}
+
+func (s *UserServiceImpl) ListUser() []*query.User {
+	var queryResponse []*query.User
+	usrList := s.repository.List()
+
+	for _, usr := range usrList {
+		qUser := query.User{
+			Id:   usr.Id,
+			Name: usr.Name,
+		}
+		queryResponse = append(queryResponse, &qUser)
+	}
+
+	return queryResponse
 }
 
 func (s *UserServiceImpl) ListUserFriends(userId uuid.UUID) *query.UserFriends {

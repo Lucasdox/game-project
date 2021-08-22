@@ -23,6 +23,7 @@ const (
 	FRIENDS_VALUES = `?, ?`
 	SELECT_FRIENDS = `SELECT id, name, score FROM game.public.user AS u INNER JOIN game.public.user_friends AS f ON
     f.friend_id = u.id WHERE f.user_id = $1;`
+	LIST_USER = `SELECT id, name, score FROM game.public.user;`
 )
 
 type friendProjection struct {
@@ -37,6 +38,29 @@ type UserRepositoryImpl struct {
 
 func NewUserRepository(pool *pgxpool.Pool) *UserRepositoryImpl{
 	return &UserRepositoryImpl{pool: pool}
+}
+
+func (r *UserRepositoryImpl) List() []*domain.User {
+	var usrLst []*domain.User
+	rows, err := r.pool.Query(context.Background(), LIST_USER)
+
+	defer rows.Close()
+	if err != nil {
+		log.Warn("Could not retrieve friends from db, error: ", err)
+		return nil
+	}
+
+	for rows.Next() {
+		userProj := domain.User{}
+		err = rows.Scan(&userProj.Id, &userProj.Name, &userProj.Score)
+		if err != nil {
+			log.Warn(err)
+		}
+
+		usrLst = append(usrLst, &userProj)
+	}
+
+	return usrLst
 }
 
 func (r *UserRepositoryImpl) UpdateFriends(userId uuid.UUID, friendLst []uuid.UUID) (int64, error) {

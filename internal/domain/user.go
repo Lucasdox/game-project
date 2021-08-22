@@ -16,6 +16,7 @@ type User struct {
 }
 
 type UserRepository interface {
+	List() []*User
 	Create(uName string) (*User, error)
 	UpdateUserState(userId uuid.UUID, gamesPlayed uint8, score uint) error
 	FindUser(userId uuid.UUID) *User

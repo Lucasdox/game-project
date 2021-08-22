@@ -21,6 +21,15 @@ type UserHandler struct {
 	Service application.UserService
 }
 
+func (h *UserHandler) List(writer http.ResponseWriter, request *http.Request) {
+	query := h.Service.ListUser()
+
+	res, _ := json.Marshal(query)
+
+	writer.WriteHeader(http.StatusOK)
+	writer.Write(res)
+}
+
 func (h *UserHandler) Create(writer http.ResponseWriter, request *http.Request) {
 	var command command.CreateUser
 
