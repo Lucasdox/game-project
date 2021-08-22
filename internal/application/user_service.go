@@ -12,9 +12,10 @@ import (
 )
 
 type UserService interface {
-	CreateUser(user command.CreateUser) (*domain.User, error)
+	CreateUser(user command.CreateUser) (*query.User, error)
 	UpdateUserState(userId uuid.UUID, command command.UpdateUserState) error
 	LoadUserState(userId uuid.UUID) (*query.UserGameStateQuery, error)
+	UpdateUserFriends(userId uuid.UUID, command command.UpdateUserFriends) (int64, error)
 }
 
 type UserServiceImpl struct {
@@ -35,13 +36,18 @@ func (s *UserServiceImpl) LoadUserState(userId uuid.UUID) (*query.UserGameStateQ
 	return &state, err
 }
 
-func (s *UserServiceImpl) CreateUser(user command.CreateUser) (*domain.User, error) {
+func (s *UserServiceImpl) CreateUser(user command.CreateUser) (*query.User, error) {
 	usr, err := s.repository.Create(user.Name)
 	if err != nil {
 		log.Warn("error inserting user", err)
 	}
 
-	return usr, err
+	query := query.User{
+		Id:   usr.Id,
+		Name: usr.Name,
+	}
+
+	return &query, err
 }
 
 func (s *UserServiceImpl) UpdateUserState(userId uuid.UUID, command command.UpdateUserState) error {
@@ -51,6 +57,15 @@ func (s *UserServiceImpl) UpdateUserState(userId uuid.UUID, command command.Upda
 		return errors.New("no user found")
 	}
 	return s.repository.UpdateUserState(userId, command.GamesPlayed, command.Score)
+}
+
+func (s *UserServiceImpl) UpdateUserFriends(userId uuid.UUID, command command.UpdateUserFriends) (int64, error) {
+	n, err := s.repository.UpdateFriends(userId, command.Friends)
+	if err != nil {
+		log.Warnf("could not insert friends for userid: %s", n)
+		return 0, err
+	}
+	return n, err
 }
 
 func NewUserService(r domain.UserRepository) *UserServiceImpl {

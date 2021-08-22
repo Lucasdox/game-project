@@ -85,3 +85,29 @@ func (h *UserHandler) LoadUserState(writer http.ResponseWriter, request *http.Re
 	writer.WriteHeader(http.StatusOK)
 	writer.Write(res)
 }
+
+func (h *UserHandler) UpdateUserFriends(writer http.ResponseWriter, request *http.Request) {
+	var command command.UpdateUserFriends
+	vars := mux.Vars(request)
+	id, err := uuid.FromString(vars["userId"])
+	if err != nil {
+		log.Warn("Request with invalid UUID")
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	err = json.NewDecoder(request.Body).Decode(&command)
+	if err != nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	newFriends, err := h.Service.UpdateUserFriends(id, command)
+	if err != nil {
+		log.Warn("error inserting friends")
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	log.Infof("%d new friends created", newFriends)
+
+	writer.WriteHeader(http.StatusCreated)
+}
