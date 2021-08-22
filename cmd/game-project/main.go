@@ -22,6 +22,7 @@ func NewApplicationHandler(u *handler.UserHandler) *ApplicationHandler {
 func Router(appHandler *ApplicationHandler) *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/user", appHandler.UserHandler.Create).Methods("POST")
+	r.HandleFunc("/user/{userId}/state", appHandler.UserHandler.UpdateUserState).Methods("PUT")
 
 	return r
 }
