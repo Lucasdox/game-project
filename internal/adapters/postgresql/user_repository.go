@@ -12,7 +12,7 @@ import (
 
 const (
 	INSERT_USER = `INSERT into game.public.user (id, name) VALUES ($1, $2);`
-	UPDATE_USER = `UPDATE game.public.user SET games_played = $1, score = $2 WHERE id = $3;`
+	UPDATE_USER = `UPDATE game.public.user SET games_played = $1, score = GREATEST(score, $2) WHERE id = $3;`
 	SELECT_USER = `SELECT id, name, games_played, score FROM game.public.user WHERE id = $1;`
 )
 
@@ -52,7 +52,7 @@ func (r *UserRepositoryImpl) FindUser(userId uuid.UUID) *domain.User {
 
 	err := row.Scan(&user.Id, &user.Name, &user.GamesPlayed, &user.Score)
 	if err != nil {
-		log.Warnf("User with id %s not found, error: %s", userId, err)
+		log.Warnf("User with id %s not found", userId)
 		return nil
 	}
 

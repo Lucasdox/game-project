@@ -6,6 +6,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
 
 	"game-project/internal/application"
 	"game-project/internal/application/command"
@@ -62,4 +63,25 @@ func (h *UserHandler) UpdateUserState(writer http.ResponseWriter, request *http.
 	}
 
 	writer.WriteHeader(http.StatusOK)
+}
+
+func (h *UserHandler) LoadUserState(writer http.ResponseWriter, request *http.Request) {
+	vars := mux.Vars(request)
+	id, err := uuid.FromString(vars["userId"])
+	if err != nil {
+		log.Warn("Request with invalid UUID")
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	state, err := h.Service.LoadUserState(id)
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	res, _ := json.Marshal(state)
+
+	writer.WriteHeader(http.StatusOK)
+	writer.Write(res)
 }
