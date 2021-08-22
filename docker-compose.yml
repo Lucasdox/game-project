@@ -1,0 +1,14 @@
+version: '3.5'
+
+services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    volumes:
+      - ./postgres-data:/data/postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=game
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
