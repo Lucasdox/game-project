@@ -16,11 +16,17 @@ type UserService interface {
 	UpdateUserState(userId uuid.UUID, command command.UpdateUserState) error
 	LoadUserState(userId uuid.UUID) (*query.UserGameStateQuery, error)
 	UpdateUserFriends(userId uuid.UUID, command command.UpdateUserFriends) (int64, error)
+	ListUserFriends(userId uuid.UUID) *query.UserFriends
 }
 
 type UserServiceImpl struct {
 	repository domain.UserRepository
 }
+
+func (s *UserServiceImpl) ListUserFriends(userId uuid.UUID) *query.UserFriends {
+	return s.repository.ListFriends(userId)
+}
+
 
 func (s *UserServiceImpl) LoadUserState(userId uuid.UUID) (*query.UserGameStateQuery, error) {
 	usr := s.repository.FindUser(userId)

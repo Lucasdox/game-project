@@ -2,6 +2,7 @@ package postgresql
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"strconv"
 	"strings"
@@ -10,6 +11,7 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	log "github.com/sirupsen/logrus"
 
+	"game-project/internal/application/query"
 	"game-project/internal/domain"
 )
 
@@ -19,7 +21,15 @@ const (
 	SELECT_USER = `SELECT id, name, games_played, score FROM game.public.user WHERE id = $1;`
 	INSERT_FRIENDS = `INSERT into game.public.user_friends (user_id, friend_id) VALUES %s ON CONFLICT DO NOTHING;`
 	FRIENDS_VALUES = `?, ?`
+	SELECT_FRIENDS = `SELECT id, name, score FROM game.public.user AS u INNER JOIN game.public.user_friends AS f ON
+    f.friend_id = u.id WHERE f.user_id = $1;`
 )
+
+type friendProjection struct {
+	Id        uuid.UUID `json:"id"`
+	Name      string    `json:"name"`
+	Highscore sql.NullInt32      `json:"highscore,omitempty"`
+}
 
 type UserRepositoryImpl struct {
 	pool *pgxpool.Pool
@@ -74,6 +84,35 @@ func (r *UserRepositoryImpl) FindUser(userId uuid.UUID) *domain.User {
 	}
 
 	return &user
+}
+
+func (r *UserRepositoryImpl) ListFriends(userId uuid.UUID) *query.UserFriends {
+	var friendList []*query.Friend
+	rows, err := r.pool.Query(context.Background(), SELECT_FRIENDS, userId)
+	defer rows.Close()
+	if err != nil {
+		log.Warn("Could not retrieve friends from db, error: ", err)
+		return nil
+	}
+
+	for rows.Next() {
+		friendProj := friendProjection{}
+		err = rows.Scan(&friendProj.Id, &friendProj.Name, &friendProj.Highscore)
+		friend := &query.Friend{
+			Id:        friendProj.Id,
+			Name:      friendProj.Name,
+		}
+		if friendProj.Highscore.Valid {
+			friend.Highscore = friendProj.Highscore.Int32
+		}
+		if err != nil {
+			log.Warn(err)
+		}
+
+		friendList = append(friendList, friend)
+	}
+
+	return &query.UserFriends{Friends: friendList}
 }
 
 func getBulkInsertSQL(SQLString string, rowValueSQL string, numRows int) string {

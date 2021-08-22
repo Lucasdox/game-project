@@ -4,6 +4,8 @@ import(
 	"database/sql"
 
 	"github.com/gofrs/uuid"
+
+	"game-project/internal/application/query"
 )
 
 type User struct {
@@ -18,4 +20,5 @@ type UserRepository interface {
 	UpdateUserState(userId uuid.UUID, gamesPlayed uint8, score uint) error
 	FindUser(userId uuid.UUID) *User
 	UpdateFriends(userId uuid.UUID, friendLst []uuid.UUID) (touchedRows int64, err error)
+	ListFriends(userId uuid.UUID) *query.UserFriends
 }

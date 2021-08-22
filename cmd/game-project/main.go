@@ -25,6 +25,7 @@ func Router(appHandler *ApplicationHandler) *mux.Router {
 	r.HandleFunc("/user/{userId}/state", appHandler.UserHandler.UpdateUserState).Methods("PUT")
 	r.HandleFunc("/user/{userId}/state", appHandler.UserHandler.LoadUserState).Methods("GET")
 	r.HandleFunc("/user/{userId}/friends", appHandler.UserHandler.UpdateUserFriends).Methods("PUT")
+	r.HandleFunc("/user/{userId}/friends", appHandler.UserHandler.ListUserFriends).Methods("GET")
 
 	return r
 }

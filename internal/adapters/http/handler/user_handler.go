@@ -111,3 +111,19 @@ func (h *UserHandler) UpdateUserFriends(writer http.ResponseWriter, request *htt
 
 	writer.WriteHeader(http.StatusCreated)
 }
+
+func (h *UserHandler) ListUserFriends(writer http.ResponseWriter, request *http.Request) {
+	vars := mux.Vars(request)
+	id, err := uuid.FromString(vars["userId"])
+	if err != nil {
+		log.Warn("Request with invalid UUID")
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	userFriends := h.Service.ListUserFriends(id)
+	res, _ := json.Marshal(userFriends)
+
+	writer.WriteHeader(http.StatusOK)
+	writer.Write(res)
+}
