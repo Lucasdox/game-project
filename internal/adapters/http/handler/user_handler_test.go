@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -85,6 +86,106 @@ func TestUserHandler_Create(t *testing.T) {
 		var response *query.User
 		handler := &UserHandler{Service: tc.fakeServiceImpl}
 		r, _ := http.NewRequest("POST", "/user", strings.NewReader(tc.body))
+		w := httptest.NewRecorder()
+		router(handler).ServeHTTP(w, r)
+
+		json.NewDecoder(w.Body).Decode(&response)
+		if w.Code != tc.expectedStatus {
+			t.Fatalf("wrong status retrieved, should be %d and received %d instead", w.Code, tc.expectedStatus)
+		}
+		if !reflect.DeepEqual(tc.expectedResult, response) {
+			t.Fatalf("body response and expected result does not match. expected %+v and received %+v", tc.expectedResult, response)
+		}
+	}
+}
+
+func TestUserHandler_LoadUserState(t *testing.T) {
+	cases := []struct {
+		fakeServiceImpl *fakeServiceImpl
+		expectedResult *query.UserGameStateQuery
+		expectedErr error
+		expectedStatus int
+	} {
+		{
+			fakeServiceImpl: &fakeServiceImpl{
+				loadUserStateResult: &query.UserGameStateQuery{
+					GamesPlayed: 2,
+					Score:       300,
+				},
+			},
+			expectedErr: nil,
+			expectedResult: &query.UserGameStateQuery{
+				GamesPlayed: 2,
+				Score:       300,
+			},
+			expectedStatus: http.StatusOK,
+		},
+	}
+	for _, tc := range cases {
+		var response *query.UserGameStateQuery
+		handler := &UserHandler{Service: tc.fakeServiceImpl}
+		id, _ := uuid.NewV4()
+		r, _ := http.NewRequest("GET", fmt.Sprintf("/user/%s/state", id), nil)
+		w := httptest.NewRecorder()
+		router(handler).ServeHTTP(w, r)
+
+		json.NewDecoder(w.Body).Decode(&response)
+		if w.Code != tc.expectedStatus {
+			t.Fatalf("wrong status retrieved, should be %d and received %d instead", w.Code, tc.expectedStatus)
+		}
+		if !reflect.DeepEqual(tc.expectedResult, response) {
+			t.Fatalf("body response and expected result does not match. expected %+v and received %+v", tc.expectedResult, response)
+		}
+	}
+}
+
+func TestUserHandler_ListUserFriends(t *testing.T) {
+	cases := []struct {
+		fakeServiceImpl *fakeServiceImpl
+		expectedResult *query.UserFriends
+		expectedErr error
+		expectedStatus int
+	} {
+		{
+			fakeServiceImpl: &fakeServiceImpl{
+				listUserFriendsResult: &query.UserFriends{
+					Friends: []*query.Friend{
+						{
+							Id:        uuid.UUID{},
+							Name:      "Jeferson",
+							Highscore: 20,
+						},
+						{
+							Id:        uuid.UUID{},
+							Name:      "Claudio",
+							Highscore: 35,
+						},
+					},
+				},
+			},
+			expectedErr: nil,
+			expectedResult: &query.UserFriends{
+				Friends: []*query.Friend{
+					{
+						Id:        uuid.UUID{},
+						Name:      "Jeferson",
+						Highscore: 20,
+					},
+					{
+						Id:        uuid.UUID{},
+						Name:      "Claudio",
+						Highscore: 35,
+					},
+				},
+			},
+			expectedStatus: http.StatusOK,
+		},
+	}
+	for _, tc := range cases {
+		var response *query.UserFriends
+		handler := &UserHandler{Service: tc.fakeServiceImpl}
+		id, _ := uuid.NewV4()
+		r, _ := http.NewRequest("GET", fmt.Sprintf("/user/%s/friends", id), nil)
 		w := httptest.NewRecorder()
 		router(handler).ServeHTTP(w, r)
 
