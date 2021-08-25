@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -18,7 +19,6 @@ func TestUserHandler_List(t *testing.T) {
 	cases := []struct {
 		fakeServiceImpl *fakeServiceImpl
 		expectedResult []*query.User
-		expectedErr error
 		expectedStatus int
 
 	} {
@@ -31,7 +31,6 @@ func TestUserHandler_List(t *testing.T) {
 					},
 				},
 			},
-			expectedErr: nil,
 			expectedResult: []*query.User{
 				{
 					Id:   uuid.UUID{},
@@ -59,7 +58,44 @@ func TestUserHandler_List(t *testing.T) {
 }
 
 func TestUserHandler_Create(t *testing.T) {
+	cases := []struct {
+		fakeServiceImpl *fakeServiceImpl
+		expectedResult *query.User
+		body string
+		expectedErr error
+		expectedStatus int
+	} {
+		{
+			fakeServiceImpl: &fakeServiceImpl{
+				createUserResult: &query.User{
+					Id:   uuid.UUID{},
+					Name: "Paul",
+				},
+			},
+			body: "{\n\t\"name\": \"Jefferson\"\n}",
+			expectedErr: nil,
+			expectedResult: &query.User{
+				Id:   uuid.UUID{},
+				Name: "Paul",
+			},
+			expectedStatus: http.StatusCreated,
+		},
+	}
+	for _, tc := range cases {
+		var response *query.User
+		handler := &UserHandler{Service: tc.fakeServiceImpl}
+		r, _ := http.NewRequest("POST", "/user", strings.NewReader(tc.body))
+		w := httptest.NewRecorder()
+		router(handler).ServeHTTP(w, r)
 
+		json.NewDecoder(w.Body).Decode(&response)
+		if w.Code != tc.expectedStatus {
+			t.Fatalf("wrong status retrieved, should be %d and received %d instead", w.Code, tc.expectedStatus)
+		}
+		if !reflect.DeepEqual(tc.expectedResult, response) {
+			t.Fatalf("body response and expected result does not match. expected %+v and received %+v", tc.expectedResult, response)
+		}
+	}
 }
 
 type fakeServiceImpl struct {
