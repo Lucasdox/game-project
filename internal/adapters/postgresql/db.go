@@ -20,5 +20,6 @@ func CreatePool() *pgxpool.Pool{
 		log.Fatal("error starting the database: ", err)
 	}
 
+	log.Info("Database initialized")
 	return pool
 }
