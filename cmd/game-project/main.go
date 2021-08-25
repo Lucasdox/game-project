@@ -10,16 +10,16 @@ import (
 )
 
 type ApplicationHandler struct {
-	UserHandler  *handler.UserHandler
+	UserHandler  handler.UserHandler
 }
 
-func NewApplicationHandler(u *handler.UserHandler) *ApplicationHandler {
-	return &ApplicationHandler{
+func NewApplicationHandler(u handler.UserHandler) ApplicationHandler {
+	return ApplicationHandler{
 		UserHandler: u,
 	}
 }
 
-func Router(appHandler *ApplicationHandler) *mux.Router {
+func Router(appHandler ApplicationHandler) *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/user", appHandler.UserHandler.List).Methods("GET")
 	r.HandleFunc("/user", appHandler.UserHandler.Create).Methods("POST")
@@ -39,5 +39,4 @@ func main() {
 	router := Router(appHandler)
 
 	http.ListenAndServe(":8080", router)
-
 }

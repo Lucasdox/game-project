@@ -13,15 +13,15 @@ import (
 	"game-project/internal/domain"
 )
 
-func NewUserHandler(repository domain.UserRepository) *UserHandler {
-	return &UserHandler{Service: application.NewUserService(repository)}
+func NewUserHandler(repository domain.UserRepository) UserHandler {
+	return UserHandler{Service: application.NewUserService(repository)}
 }
 
 type UserHandler struct {
 	Service application.UserService
 }
 
-func (h *UserHandler) List(writer http.ResponseWriter, request *http.Request) {
+func (h UserHandler) List(writer http.ResponseWriter, request *http.Request) {
 	log.Info("Received List all users request")
 	query := h.Service.ListUser()
 
@@ -31,7 +31,7 @@ func (h *UserHandler) List(writer http.ResponseWriter, request *http.Request) {
 	writer.Write(res)
 }
 
-func (h *UserHandler) Create(writer http.ResponseWriter, request *http.Request) {
+func (h UserHandler) Create(writer http.ResponseWriter, request *http.Request) {
 	log.Info("Received Create user request")
 	var command command.CreateUser
 
@@ -53,7 +53,7 @@ func (h *UserHandler) Create(writer http.ResponseWriter, request *http.Request) 
 	writer.Write(res)
 }
 
-func (h *UserHandler) UpdateUserState(writer http.ResponseWriter, request *http.Request) {
+func (h UserHandler) UpdateUserState(writer http.ResponseWriter, request *http.Request) {
 	var command command.UpdateUserState
 	vars := mux.Vars(request)
 	log.Infof("Received UpdateUserState request for user id: %s", vars["userId"])
@@ -77,7 +77,7 @@ func (h *UserHandler) UpdateUserState(writer http.ResponseWriter, request *http.
 	writer.WriteHeader(http.StatusOK)
 }
 
-func (h *UserHandler) LoadUserState(writer http.ResponseWriter, request *http.Request) {
+func (h UserHandler) LoadUserState(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	id, err := uuid.FromString(vars["userId"])
 	log.Infof("Received LoadUserState request for user id: %s", vars["userId"])
@@ -99,7 +99,7 @@ func (h *UserHandler) LoadUserState(writer http.ResponseWriter, request *http.Re
 	writer.Write(res)
 }
 
-func (h *UserHandler) UpdateUserFriends(writer http.ResponseWriter, request *http.Request) {
+func (h UserHandler) UpdateUserFriends(writer http.ResponseWriter, request *http.Request) {
 	var command command.UpdateUserFriends
 	vars := mux.Vars(request)
 	id, err := uuid.FromString(vars["userId"])
@@ -126,7 +126,7 @@ func (h *UserHandler) UpdateUserFriends(writer http.ResponseWriter, request *htt
 	writer.WriteHeader(http.StatusCreated)
 }
 
-func (h *UserHandler) ListUserFriends(writer http.ResponseWriter, request *http.Request) {
+func (h UserHandler) ListUserFriends(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	id, err := uuid.FromString(vars["userId"])
 	log.Infof("Received ListUserFriends request for user id: %s", vars["userId"])
