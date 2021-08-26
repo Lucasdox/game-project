@@ -47,6 +47,41 @@ func TestUserServiceImpl_CreateUser(t *testing.T) {
 	}
 }
 
+func TestUserServiceImpl_ListUser(t *testing.T) {
+	cases := []struct {
+		fakeRepository *fakeUserRepository
+		expectedResult []*query.User
+		expectedErr error
+	}{
+		{
+			fakeRepository: &fakeUserRepository{
+				listMock:        []*domain.User{
+					{
+						Id:          uuid.UUID{},
+						Name:        "Jake",
+					},
+				},
+				errMock:         nil,
+			},
+			expectedResult: []*query.User{
+				{
+					Id:   uuid.UUID{},
+					Name: "Jake",
+				},
+			},
+			expectedErr:    nil,
+		},
+	}
+
+	for _, tc := range cases {
+		service := UserServiceImpl{repository: tc.fakeRepository}
+		result := service.ListUser()
+		if !reflect.DeepEqual(result, tc.expectedResult) {
+			t.Errorf("expected result: %v , actual: %v", tc.expectedResult, result)
+		}
+	}
+}
+
 type fakeUserRepository struct {
 	listMock []*domain.User
 	createMock *domain.User
