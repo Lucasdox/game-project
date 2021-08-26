@@ -22,12 +22,12 @@ Game-Project uses te following technologies:
 - [Gorilla-Mux] - fast and lightweight router framework
 
 ## Routes
-[GET - "/user"]
-[POST - "/user"]
-[PUT - "/user/{userId}/state"]
-[GET - "/user/{userId}/state"]
-[PUT - "/user/{userId}/friends"]
-[GET - "/user/{userId}/friends"]
+- [GET - "/user"]
+- [POST - "/user"]
+- [PUT - "/user/{userId}/state"]
+- [GET - "/user/{userId}/state"]
+- [PUT - "/user/{userId}/friends"]
+- [GET - "/user/{userId}/friends"]
 
 ## Starting the application
 Chose one of the options below:
