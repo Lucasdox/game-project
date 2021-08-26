@@ -2,13 +2,14 @@ package postgresql
 
 import (
 	"context"
-
+	"fmt"
 	"github.com/jackc/pgx/v4/pgxpool"
 	log "github.com/sirupsen/logrus"
 )
 
-func CreatePool() *pgxpool.Pool{
-	connString := "postgresql://root:root@localhost:5432/game?sslmode=disable"
+func CreatePool(host string) *pgxpool.Pool{
+	connString := fmt.Sprintf("postgresql://root:root@%s:5432/game?sslmode=disable", host)
+
 	config, err := pgxpool.ParseConfig(connString)
 
 	if err != nil {

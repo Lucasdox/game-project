@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 
 	log "github.com/sirupsen/logrus"
 
@@ -40,10 +42,14 @@ func Router(appHandler ApplicationHandler) *mux.Router {
 
 func main() {
 	log.Info("Starting application")
+	host := os.Getenv("pgHost")
+	if host == "" {
+		host = "localhost"
+	}
 
 	m, err := migrate.New(
 		"file://data/migrations",
-		"postgresql://root:root@localhost:5432/game?sslmode=disable",
+		fmt.Sprintf("postgresql://root:root@%s:5432/game?sslmode=disable", host),
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -56,7 +62,7 @@ func main() {
 		}
 	}
 
-	pool := postgresql.CreatePool()
+	pool := postgresql.CreatePool(host)
 
 	userRepository := postgresql.NewUserRepository(pool)
 

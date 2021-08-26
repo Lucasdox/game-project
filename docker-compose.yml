@@ -1,14 +1,28 @@
 version: '3.5'
 
 services:
-  postgres:
+  postgres-db:
     image: postgres:latest
     restart: always
     volumes:
       - ./postgres-data:/data/postgres
     ports:
       - "5432:5432"
+    expose:
+      - "5432"
     environment:
       - POSTGRES_DB=game
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
+
+  application:
+    restart: on-failure
+    environment:
+      pgHost: "postgres-db"
+    image: lucasdox/game-project:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres-db
+
+
