@@ -22,14 +22,18 @@ Game-Project uses te following technologies:
 - [Gorilla-Mux] - fast and lightweight router framework
 
 
-## Testing
+## Starting the application
 Chose one of the options below:
 
 ### 1 - Docker-Compose
-Simply run: docker-compose up -d and test the endpoints.
+Simply run: ```docker-compose up -d ``` and call the endpoints.
 
 ### 2 - Starting the plain application
 Remove the application container from docker-compose.
-Run docker-compose up -d
-Run make clean
-Run make run
+Run:
+```
+docker-compose up -d
+make clean
+make run
+```
+   
