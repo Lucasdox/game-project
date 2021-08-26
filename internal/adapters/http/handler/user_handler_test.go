@@ -228,8 +228,8 @@ func (f fakeServiceImpl) UpdateUserFriends(userId uuid.UUID, command command.Upd
 	return f.nUserFriendsUpdated, f.err
 }
 
-func (f fakeServiceImpl) ListUserFriends(userId uuid.UUID) *query.UserFriends {
-	return f.listUserFriendsResult
+func (f fakeServiceImpl) ListUserFriends(userId uuid.UUID) (*query.UserFriends, error) {
+	return f.listUserFriendsResult, f.err
 }
 
 func router(handler *UserHandler) *mux.Router {

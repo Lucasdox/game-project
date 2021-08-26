@@ -2,6 +2,7 @@ package application
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/gofrs/uuid"
 	log "github.com/sirupsen/logrus"
@@ -17,7 +18,7 @@ type UserService interface {
 	UpdateUserState(userId uuid.UUID, command command.UpdateUserState) error
 	LoadUserState(userId uuid.UUID) (*query.UserGameStateQuery, error)
 	UpdateUserFriends(userId uuid.UUID, command command.UpdateUserFriends) (int64, error)
-	ListUserFriends(userId uuid.UUID) *query.UserFriends
+	ListUserFriends(userId uuid.UUID) (*query.UserFriends, error)
 }
 
 type UserServiceImpl struct {
@@ -39,7 +40,11 @@ func (s *UserServiceImpl) ListUser() []*query.User {
 	return queryResponse
 }
 
-func (s *UserServiceImpl) ListUserFriends(userId uuid.UUID) *query.UserFriends {
+func (s *UserServiceImpl) ListUserFriends(userId uuid.UUID) (*query.UserFriends, error) {
+	user := s.repository.FindUser(userId)
+	if user == nil {
+		return nil, errors.New(fmt.Sprintf("no user with id %s found", userId))
+	}
 	var friendsLstRes []*query.Friend
 	friendLst := s.repository.ListFriends(userId)
 
@@ -54,7 +59,7 @@ func (s *UserServiceImpl) ListUserFriends(userId uuid.UUID) *query.UserFriends {
 		friendsLstRes = append(friendsLstRes, &friendRes)
 	}
 
-	return &query.UserFriends{Friends: friendsLstRes}
+	return &query.UserFriends{Friends: friendsLstRes}, nil
 }
 
 
@@ -98,7 +103,7 @@ func (s *UserServiceImpl) UpdateUserState(userId uuid.UUID, command command.Upda
 func (s *UserServiceImpl) UpdateUserFriends(userId uuid.UUID, command command.UpdateUserFriends) (int64, error) {
 	n, err := s.repository.UpdateFriends(userId, command.Friends)
 	if err != nil {
-		log.Warnf("could not insert friends for userid: %s", n)
+		log.Warnf("could not insert friends for userid: %d", n)
 		return 0, err
 	}
 	return n, err

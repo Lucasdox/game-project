@@ -89,7 +89,7 @@ func (h UserHandler) LoadUserState(writer http.ResponseWriter, request *http.Req
 
 	state, err := h.Service.LoadUserState(id)
 	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
+		writer.WriteHeader(http.StatusNotFound)
 		return
 	}
 
@@ -118,7 +118,7 @@ func (h UserHandler) UpdateUserFriends(writer http.ResponseWriter, request *http
 	newFriends, err := h.Service.UpdateUserFriends(id, command)
 	if err != nil {
 		log.Warn("error inserting friends")
-		writer.WriteHeader(http.StatusInternalServerError)
+		writer.WriteHeader(http.StatusNotFound)
 		return
 	}
 	log.Infof("%d new friends created", newFriends)
@@ -136,7 +136,11 @@ func (h UserHandler) ListUserFriends(writer http.ResponseWriter, request *http.R
 		return
 	}
 
-	userFriends := h.Service.ListUserFriends(id)
+	userFriends, err := h.Service.ListUserFriends(id)
+	if err != nil {
+		writer.WriteHeader(http.StatusNotFound)
+		return
+	}
 	res, _ := json.Marshal(userFriends)
 
 	writer.WriteHeader(http.StatusOK)

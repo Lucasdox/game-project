@@ -21,7 +21,7 @@ services:
       pgHost: "postgres-db"
     image: lucasdox/game-project:latest
     ports:
-      - "8080:8080"
+      - "8082:8080"
     depends_on:
       - postgres-db
 
