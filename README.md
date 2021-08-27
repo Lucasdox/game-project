@@ -1,17 +1,6 @@
 # Game-Project (Lucas Augusto Sales)
 
-
-
 Game-Project is a simple backend CRUD for a game application.
-
-
-## Features
-
-- Import a HTML file and watch it magically convert to Markdown
-- Drag and drop images (requires your Dropbox account be linked)
-- Import and save files from GitHub, Dropbox, Google Drive and One Drive
-- Drag and drop markdown and HTML files into Dillinger
-- Export documents as Markdown, HTML and PDF
 
 ## Tech
 
@@ -29,11 +18,16 @@ Game-Project uses te following technologies:
 - [PUT - "/user/{userId}/friends"]
 - [GET - "/user/{userId}/friends"]
 
+## Collections
+You may export the collections at the path ./data/collections.json to your Postman/Insomnia.
+
 ## Starting the application
 Chose one of the options below:
 
 ### 1 - Docker-Compose
 Simply run: ```docker-compose up -d ``` and call the endpoints.
+
+If you wish to test the application using docker-compose. Use base url as ```http://localhost:8082```
 
 ### 2 - Starting the plain application
 Remove the application container from docker-compose.
@@ -43,4 +37,16 @@ docker-compose up -d
 make clean
 make run
 ```
+
+If you wish to test starting the plain application. Use base url as ```http://localhost:8080```
+
+## Executing unitary tests
+Simply run:
+```
+make test
+```
+
+Sadly I couldn't make the coverage 100% and add integration tests :(
+
+
    
